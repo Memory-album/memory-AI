@@ -16,6 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "Memory AI API 서버에 오신 것을 환영합니다!"}
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
