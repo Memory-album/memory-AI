@@ -1,0 +1,319 @@
+{
+  "questions": [
+    {
+      "category": "temporal",
+      "level": 1,
+      "question": "이 사진은 언제 찍은 것인가요?"
+    },
+    {
+      "category": "sensory",
+      "level": 3,
+      "question": "이 실외 공간의 분위기는 어떠했나요?"
+    },
+    {
+      "category": "relational",
+      "level": 1,
+      "question": "사진 속 사람들은 누구인가요?"
+    },
+    {
+      "category": "relational",
+      "level": 2,
+      "question": "이 자리에서 서로 어떤 이야기를 나누었나요?"
+    },
+    {
+      "category": "relational",
+      "level": 3,
+      "question": "이 순간이 서로의 관계에 어떤 의미를 가져다주었나요?"
+    }
+  ],
+  "analysis_result": {
+    "labels": [
+      {
+        "description": "Grassland",
+        "score": 0.9015594720840454,
+        "topicality": 0.002826887182891369
+      },
+      {
+        "description": "Leisure",
+        "score": 0.8796248435974121,
+        "topicality": 0.021166551858186722
+      },
+      {
+        "description": "Happiness",
+        "score": 0.8774986863136292,
+        "topicality": 0.046917520463466644
+      },
+      {
+        "description": "Child",
+        "score": 0.8700004816055298,
+        "topicality": 0.05398189648985863
+      },
+      {
+        "description": "People in nature",
+        "score": 0.867178738117218,
+        "topicality": 0.0020391279831528664
+      },
+      {
+        "description": "Recreation",
+        "score": 0.8629533052444458,
+        "topicality": 0.012405507266521454
+      },
+      {
+        "description": "Meadow",
+        "score": 0.8108684420585632,
+        "topicality": 0.001320403185673058
+      },
+      {
+        "description": "Picnic",
+        "score": 0.7988240718841553,
+        "topicality": 0.21445299685001373
+      },
+      {
+        "description": "Wetland",
+        "score": 0.78488689661026,
+        "topicality": 0.0002630717644933611
+      },
+      {
+        "description": "Fun",
+        "score": 0.7800660133361816,
+        "topicality": 0.016588430851697922
+      }
+    ],
+    "objects": [
+      {
+        "name": "Top",
+        "score": 0.7682814598083496,
+        "bounding_box": {
+          "left": 0.33984375,
+          "top": 0.52734375,
+          "right": 0.5,
+          "bottom": 0.703125
+        }
+      },
+      {
+        "name": "Clothing",
+        "score": 0.7592505812644958,
+        "bounding_box": {
+          "left": 0.337890625,
+          "top": 0.52734375,
+          "right": 0.5,
+          "bottom": 0.8671875
+        }
+      },
+      {
+        "name": "Clothing",
+        "score": 0.751867413520813,
+        "bounding_box": {
+          "left": 0.578125,
+          "top": 0.419921875,
+          "right": 0.84375,
+          "bottom": 0.8984375
+        }
+      },
+      {
+        "name": "Wheel",
+        "score": 0.723418653011322,
+        "bounding_box": {
+          "left": 0.349609375,
+          "top": 0.8203125,
+          "right": 0.400390625,
+          "bottom": 0.95703125
+        }
+      },
+      {
+        "name": "Clothing",
+        "score": 0.717084527015686,
+        "bounding_box": {
+          "left": 0.400390625,
+          "top": 0.69921875,
+          "right": 0.490234375,
+          "bottom": 0.875
+        }
+      },
+      {
+        "name": "Person",
+        "score": 0.7159801721572876,
+        "bounding_box": {
+          "left": 0.310546875,
+          "top": 0.421875,
+          "right": 0.50390625,
+          "bottom": 0.93359375
+        }
+      },
+      {
+        "name": "Person",
+        "score": 0.704501211643219,
+        "bounding_box": {
+          "left": 0.310546875,
+          "top": 0.421875,
+          "right": 0.50390625,
+          "bottom": 0.93359375
+        }
+      },
+      {
+        "name": "Dress",
+        "score": 0.7040545344352722,
+        "bounding_box": {
+          "left": 0.578125,
+          "top": 0.419921875,
+          "right": 0.84375,
+          "bottom": 0.8984375
+        }
+      },
+      {
+        "name": "Person",
+        "score": 0.6958003640174866,
+        "bounding_box": {
+          "left": 0.5234375,
+          "top": 0.28125,
+          "right": 0.8515625,
+          "bottom": 0.98046875
+        }
+      },
+      {
+        "name": "Person",
+        "score": 0.6764526963233948,
+        "bounding_box": {
+          "left": 0.5390625,
+          "top": 0.2890625,
+          "right": 0.86328125,
+          "bottom": 0.97265625
+        }
+      }
+    ],
+    "faces": [
+      {
+        "confidence": 0.8984375,
+        "joy": 2,
+        "sorrow": 1,
+        "anger": 1,
+        "surprise": 1,
+        "bounding_box": {
+          "left": 914,
+          "top": 255,
+          "right": 1028,
+          "bottom": 388
+        }
+      },
+      {
+        "confidence": 0.703125,
+        "joy": 2,
+        "sorrow": 1,
+        "anger": 1,
+        "surprise": 1,
+        "bounding_box": {
+          "left": 492,
+          "top": 371,
+          "right": 572,
+          "bottom": 463
+        }
+      }
+    ],
+    "landmarks": [],
+    "text": {
+      "full_text": "",
+      "texts": []
+    },
+    "safe_search": {
+      "adult": 3,
+      "medical": 1,
+      "spoof": 1,
+      "violence": 2,
+      "racy": 3
+    },
+    "colors": {
+      "dominant_colors": [
+        {
+          "color": {
+            "red": 115.0,
+            "green": 121.0,
+            "blue": 66.0
+          },
+          "score": 0.19081524014472961,
+          "pixel_fraction": 0.1077333316206932
+        },
+        {
+          "color": {
+            "red": 182.0,
+            "green": 191.0,
+            "blue": 191.0
+          },
+          "score": 0.15195445716381073,
+          "pixel_fraction": 0.11993333697319031
+        },
+        {
+          "color": {
+            "red": 123.0,
+            "green": 119.0,
+            "blue": 87.0
+          },
+          "score": 0.14114221930503845,
+          "pixel_fraction": 0.09040000289678574
+        },
+        {
+          "color": {
+            "red": 19.0,
+            "green": 17.0,
+            "blue": 12.0
+          },
+          "score": 0.01617538370192051,
+          "pixel_fraction": 0.016866667196154594
+        },
+        {
+          "color": {
+            "red": 161.0,
+            "green": 160.0,
+            "blue": 155.0
+          },
+          "score": 0.12631988525390625,
+          "pixel_fraction": 0.10673333704471588
+        },
+        {
+          "color": {
+            "red": 123.0,
+            "green": 118.0,
+            "blue": 67.0
+          },
+          "score": 0.068113312125206,
+          "pixel_fraction": 0.02879999950528145
+        },
+        {
+          "color": {
+            "red": 161.0,
+            "green": 155.0,
+            "blue": 130.0
+          },
+          "score": 0.06722977757453918,
+          "pixel_fraction": 0.03606666624546051
+        },
+        {
+          "color": {
+            "red": 193.0,
+            "green": 188.0,
+            "blue": 159.0
+          },
+          "score": 0.050998810678720474,
+          "pixel_fraction": 0.009999999776482582
+        },
+        {
+          "color": {
+            "red": 131.0,
+            "green": 123.0,
+            "blue": 116.0
+          },
+          "score": 0.032586365938186646,
+          "pixel_fraction": 0.054999999701976776
+        },
+        {
+          "color": {
+            "red": 115.0,
+            "green": 121.0,
+            "blue": 78.0
+          },
+          "score": 0.02604198269546032,
+          "pixel_fraction": 0.018933333456516266
+        }
+      ]
+    }
+  }
+}
