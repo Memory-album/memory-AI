@@ -45,25 +45,13 @@ class BackendService:
             logger.error(f"질문 전송 중 오류 발생: {str(e)}")
             raise
             
-    async def send_image_analysis(self, image_path: str, analysis_result: Dict[str, Any]) -> Dict[str, Any]:
-        """이미지 분석 결과를 백엔드 서버로 전송
-        
-        Args:
-            image_path (str): 분석된 이미지의 경로
-            analysis_result (Dict[str, Any]): Vision API 분석 결과
-            
-        Returns:
-            Dict[str, Any]: 백엔드 서버의 응답
-        """
+    async def send_image_analysis(self, analysis_result: Dict[str, Any]) -> Dict[str, Any]:
+        """이미지 분석 결과만 백엔드 서버로 전송"""
         try:
-            # 이미지 파일과 분석 결과를 함께 전송
-            files = {'image': open(image_path, 'rb')}
-            data = {'analysis_result': analysis_result}
-            
+            # 분석 결과만 JSON 형태로 전송
             response = await self.client.post(
                 '/api/v1/images/analyze',
-                files=files,
-                data=data
+                json=analysis_result
             )
             response.raise_for_status()
             return response.json()
