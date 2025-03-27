@@ -5,6 +5,9 @@ from typing import List, Dict, Any
 import io
 import logging
 from app.core.config import settings
+import os
+from pathlib import Path
+from google.oauth2 import service_account
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +17,17 @@ class VisionAIClient:
     def __init__(self):
         """Vision API 클라이언트를 초기화합니다."""
         try:
-            self.client = ImageAnnotatorClient()
+            # 프로젝트 루트 디렉토리 찾기
+            base_dir = Path(__file__).parent.parent.parent
+            credentials_path = os.path.join(base_dir, "credentials", "vision-api-key.json")
+            
+            # 디버깅 정보
+            logger.info(f"인증 파일 경로: {credentials_path}")
+            logger.info(f"파일 존재 여부: {os.path.exists(credentials_path)}")
+            
+            # 명시적으로 인증 정보 제공
+            credentials = service_account.Credentials.from_service_account_file(credentials_path)
+            self.client = ImageAnnotatorClient(credentials=credentials)
             logger.info("Vision API 클라이언트가 성공적으로 초기화되었습니다.")
         except Exception as e:
             logger.error(f"Vision API 클라이언트 초기화 실패: {str(e)}")
