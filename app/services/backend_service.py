@@ -87,4 +87,4 @@ class BackendService:
             
         except Exception as e:
             logger.error(f"스토리 전송 중 오류 발생: {str(e)}")
-            raise 
+            raise
