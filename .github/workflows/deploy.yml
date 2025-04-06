@@ -1,24 +1,31 @@
-name: Deploy to EC2
+- name: Open port 22 for all IPs temporarily
+  run: |
+    aws ec2 authorize-security-group-ingress \
+      --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+      --protocol tcp \
+      --port 22 \
+      --cidr 0.0.0.0/0 \
+      --region ${{ secrets.AWS_REGION }}
 
-on:
-  push:
-    branches: [ main ]  # main 브랜치에 push될 때 실행
+- name: Deploy to EC2 via SSH
+  uses: appleboy/ssh-action@master
+  with:
+    host: ${{ secrets.EC2_HOST }}
+    username: ubuntu
+    key: ${{ secrets.EC2_KEY }}
+    port: 22
+    script: |
+      cd memory-AI
+      git pull origin main
+      source venv/bin/activate
+      pip install -r requirements.txt
+      sudo systemctl restart start-fastapi
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Deploy to EC2 via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_KEY }}
-        port: 22
-        script: |
-          cd memory-AI
-          git pull origin main
-          source venv/bin/activate
-          pip install -r requirements.txt
-          sudo systemctl restart start-fastapi
+- name: Close port 22 after deploy
+  run: |
+    aws ec2 revoke-security-group-ingress \
+      --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+      --protocol tcp \
+      --port 22 \
+      --cidr 0.0.0.0/0 \
+      --region ${{ secrets.AWS_REGION }}
