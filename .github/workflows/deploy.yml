@@ -22,7 +22,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        region: ap-northeast-2 # EC2 인스턴스가 있는 리전
+        aws-region: ap-northeast-2 # EC2 인스턴스가 있는 리전
 
     - name: Open port 22 for current IP
       run: |
