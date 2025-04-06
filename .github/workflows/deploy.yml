@@ -1,31 +1,46 @@
-- name: Open port 22 for all IPs temporarily
-  run: |
-    aws ec2 authorize-security-group-ingress \
-      --group-id ${{ secrets.SECURITY_GROUP_ID }} \
-      --protocol tcp \
-      --port 22 \
-      --cidr 0.0.0.0/0 \
-      --region ${{ secrets.AWS_REGION }}
+name: EC2 Auto Deploy
 
-- name: Deploy to EC2 via SSH
-  uses: appleboy/ssh-action@master
-  with:
-    host: ${{ secrets.EC2_HOST }}
-    username: ubuntu
-    key: ${{ secrets.EC2_KEY }}
-    port: 22
-    script: |
-      cd memory-AI
-      git pull origin main
-      source venv/bin/activate
-      pip install -r requirements.txt
-      sudo systemctl restart start-fastapi
+on:
+  push:
+    branches:
+      - main
 
-- name: Close port 22 after deploy
-  run: |
-    aws ec2 revoke-security-group-ingress \
-      --group-id ${{ secrets.SECURITY_GROUP_ID }} \
-      --protocol tcp \
-      --port 22 \
-      --cidr 0.0.0.0/0 \
-      --region ${{ secrets.AWS_REGION }}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Open port 22 for all IPs temporarily
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr 0.0.0.0/0 \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
+            cd memory-AI
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart start-fastapi
+
+      - name: Close port 22 after deploy
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr 0.0.0.0/0 \
+            --region ${{ secrets.AWS_REGION }}
