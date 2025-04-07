@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 from app.core.config import settings
 from app.api.v1.api import router as api_v1_router
+
+# 환경 변수 로드
+load_dotenv()
 
 app = FastAPI(
     title="Memory AI Service",

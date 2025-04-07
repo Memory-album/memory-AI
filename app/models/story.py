@@ -9,6 +9,7 @@ class StoryRequest(BaseModel):
     answers: List[Dict[str, Any]]
     image_url: Optional[str] = None
     options: Optional[Dict[str, Any]] = None
+    
 
 class StoryResponse(BaseModel):
     """스토리 생성 응답 모델"""

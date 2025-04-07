@@ -5,21 +5,34 @@ import logging
 import requests
 from datetime import datetime
 from app.core.config import settings
+from PIL import Image
+import io
+import traceback
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class StorytellingGenerator:
-    """Gemini 1.5 Flash를 사용하여 스토리텔링을 생성하는 클래스"""
     
     def __init__(self):
         """초기화 및 API 키 설정"""
+        # API 키를 환경 변수에서 직접 가져옴 (settings 객체 대신)
         self.api_key = os.getenv("GOOGLE_API_KEY")
+        
         if not self.api_key:
-            logger.warning("GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다.")
+            self.api_key = settings.GOOGLE_API_KEY
+            logger.info("API 키를 settings에서 로드했습니다.")
         else:
-            genai.configure(api_key=self.api_key)
+            logger.info("API 키를 환경 변수에서 로드했습니다.")
+            
+        # API 키 유효성 확인
+        if not self.api_key:
+            logger.error("GOOGLE_API_KEY 설정이 없습니다.")
+        else:
+            # API 키를 마스킹하여 로깅 (보안)
+            masked_key = self.api_key[:6] + "..." + self.api_key[-4:] if len(self.api_key) > 8 else "***"
+            logger.info(f"API 키 확인: {masked_key}")
     
     def create_storytelling_prompt(self, questions: List[Dict[str, Any]], 
                                    answers: List[Dict[str, Any]], 
@@ -102,45 +115,68 @@ class StorytellingGenerator:
         try:
             logger.info(f"미디어 ID {media_id}에 대한 스토리 생성 시작")
             
-            # Gemini 모델 및 구성 설정
-            model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                generation_config={
-                    "temperature": 0.7,
-                    "top_p": 1,
-                    "top_k": 32,
-                    "max_output_tokens": 800,
-                }
-            )
+            # API 키 설정
+            api_key = self.api_key
+            
+            if not api_key:
+                logger.error("API 키가 설정되지 않았습니다")
+                raise Exception("API 키가 설정되지 않았습니다")
             
             # 프롬프트 생성
             prompt = self.create_storytelling_prompt(questions, answers, options)
             logger.info(f"프롬프트 생성 완료: {len(prompt)} 자")
             
-            # 이미지 처리
-            content_parts = [prompt]
-            
-            if image_url:
-                logger.info(f"이미지 URL이 제공되었습니다: {image_url}")
-                try:
-                    # 이미지 데이터 가져오기
-                    image_response = requests.get(image_url)
-                    if image_response.status_code == 200:
-                        # 이미지 데이터를 Gemini에 맞는 형식으로 변환
-                        image_data = {"mime_type": "image/jpeg", "data": image_response.content}
-                        content_parts = [prompt, image_data]
-                        logger.info("이미지가 성공적으로 로드되었습니다.")
-                    else:
-                        logger.warning(f"이미지를 가져올 수 없습니다 (상태 코드: {image_response.status_code})")
-                except Exception as e:
-                    logger.error(f"이미지 로딩 중 오류 발생: {str(e)}")
-            
-            # Gemini 모델 호출
-            response = model.generate_content(content_parts)
-            
-            # 응답 처리
-            story_content = response.text.strip()
-            logger.info(f"스토리 생성 완료: {len(story_content)} 자")
+            # 가장 기본적인 방식으로 Gemini API 설정
+            try:
+                # SDK 구성 
+                genai.configure(api_key=api_key)
+                logger.info("Gemini API 구성 완료")
+                
+                # 최대한 단순화된 방식으로 호출
+                if image_url:
+                    try:
+                        # 이미지 데이터 가져오기
+                        logger.info(f"이미지 URL이 제공되었습니다: {image_url}")
+                        image_response = requests.get(image_url, timeout=10)
+                        
+                        if image_response.status_code == 200:
+                            # 이미지 데이터를 PIL Image로 변환
+                            image = Image.open(io.BytesIO(image_response.content))
+                            logger.info(f"이미지 크기: {image.size}, 포맷: {image.format}")
+                            
+                            # 모델 초기화 (가장 기본적인 설정)
+                            model = genai.GenerativeModel('gemini-1.5-flash')
+                            
+                            # 단순 내용 전송 (텍스트와 이미지)
+                            response = model.generate_content([prompt, image])
+                            story_content = response.text
+                            logger.info(f"스토리 생성 완료 (이미지 포함): {len(story_content)} 자")
+                        else:
+                            # 이미지 로드 실패시 텍스트만으로 진행
+                            logger.warning(f"이미지를 가져올 수 없습니다 (상태 코드: {image_response.status_code})")
+                            model = genai.GenerativeModel('gemini-1.5-flash')
+                            response = model.generate_content(prompt)
+                            story_content = response.text
+                            logger.info(f"스토리 생성 완료 (텍스트만): {len(story_content)} 자")
+                    except Exception as img_error:
+                        # 이미지 처리 오류시 상세 로깅 후 텍스트만으로 재시도
+                        logger.error(f"이미지 처리 중 오류 발생: {str(img_error)}")
+                        logger.error(traceback.format_exc())
+                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        response = model.generate_content(prompt)
+                        story_content = response.text
+                        logger.info(f"이미지 없이 텍스트만으로 스토리 생성 완료: {len(story_content)} 자")
+                else:
+                    # 텍스트만 있는 경우 단순 처리
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    response = model.generate_content(prompt)
+                    story_content = response.text
+                    logger.info(f"텍스트만으로 스토리 생성 완료: {len(story_content)} 자")
+                
+            except Exception as api_error:
+                logger.error(f"Gemini API 호출 중 오류 발생: {str(api_error)}")
+                logger.error(traceback.format_exc())
+                raise Exception(f"Gemini API 호출 실패: {str(api_error)}")
             
             # 응답 구성
             return {
@@ -152,6 +188,7 @@ class StorytellingGenerator:
             
         except Exception as e:
             logger.error(f"스토리 생성 중 오류 발생: {str(e)}")
+            logger.error(traceback.format_exc())
             return {
                 "status": "error",
                 "media_id": media_id,

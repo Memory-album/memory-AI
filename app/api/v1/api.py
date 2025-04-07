@@ -372,13 +372,14 @@ async def generate_story(request: StoryRequest) -> Dict[str, Any]:
     try:
         logger.info(f"스토리 생성 요청 수신: media_id={request.media_id}")
         
-        # 스토리텔링 생성
+        # 스토리텔링 생성 - API 키 인자 제거
         response = await storytelling_generator.generate_story(
             request.media_id,
             request.questions,
             request.answers,
             request.image_url,
             request.options
+            # API 키 전달 제거
         )
         
         # 응답 로깅 및 저장
@@ -408,6 +409,7 @@ async def generate_story(request: StoryRequest) -> Dict[str, Any]:
         return {
             "status": "error",
             "media_id": request.media_id,
-            "message": str(e)
+            "message": str(e),
+            "created_at": datetime.now().isoformat()
         }
    
