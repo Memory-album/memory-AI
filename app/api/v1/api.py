@@ -1,8 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List, Dict, Any, Optional
 from app.models.question import Question, GeneratedQuestion, AnswerText, GeneratedStory
+from app.models.story import StoryRequest, StoryResponse
 from app.core.vision import VisionAIClient
 from app.core.question_generator import QuestionGenerator
+from app.core.storytelling import StorytellingGenerator
 import aiofiles
 import os
 from app.core.config import settings
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 vision_client = VisionAIClient()
 question_generator = QuestionGenerator()
+storytelling_generator = StorytellingGenerator()
 
 # 디렉토리 생성
 os.makedirs(settings.TEMP_UPLOAD_DIR, exist_ok=True)
@@ -361,5 +364,50 @@ async def spring_connection_test(auth_token: str = None) -> Dict[str, Any]:
             "message": f"Spring 백엔드 연결 테스트 실패: {str(e)}",
             "error_details": str(e),
             "auth_token_provided": auth_token is not None
+        }
+
+@router.post("/generate-story")
+async def generate_story(request: StoryRequest) -> Dict[str, Any]:
+    """질문과 답변을 기반으로 스토리텔링을 생성합니다."""
+    try:
+        logger.info(f"스토리 생성 요청 수신: media_id={request.media_id}")
+        
+        # 스토리텔링 생성
+        response = await storytelling_generator.generate_story(
+            request.media_id,
+            request.questions,
+            request.answers,
+            request.image_url,
+            request.options
+        )
+        
+        # 응답 로깅 및 저장
+        logger.info(f"스토리 생성 완료: media_id={request.media_id}")
+        if response["status"] == "success":
+            result_file = await save_analysis_result(
+                response,
+                f"story_{request.media_id}"
+            )
+            logger.info(f"스토리 결과 저장 완료: {result_file}")
+            
+        # Spring 백엔드로 결과 전송 (선택적)
+        try:
+            backend_response = await send_to_backend(
+                response,
+                "/api/v1/stories/save",
+                None  # 인증 토큰은 선택적
+            )
+            logger.info("스토리 결과가 백엔드로 전송되었습니다.")
+        except Exception as e:
+            logger.warning(f"백엔드 전송 실패 (무시): {str(e)}")
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"스토리 생성 중 오류 발생: {str(e)}")
+        return {
+            "status": "error",
+            "media_id": request.media_id,
+            "message": str(e)
         }
    

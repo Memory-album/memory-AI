@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Translation API 설정
     GOOGLE_CLOUD_LOCATION: str = "global"
     
+    # Gemini API 설정
+    GOOGLE_API_KEY: str = ""
+    
     # 이미지 처리 설정
     TEMP_UPLOAD_DIR: str = "temp_uploads"
     MAX_IMAGE_SIZE: str = "10485760"  # 문자열로 변경
