@@ -379,7 +379,6 @@ async def generate_story(request: StoryRequest) -> Dict[str, Any]:
             request.answers,
             request.image_url,
             request.options
-            # API 키 전달 제거
         )
         
         # 응답 로깅 및 저장

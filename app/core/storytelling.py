@@ -17,7 +17,6 @@ class StorytellingGenerator:
     
     def __init__(self):
         """초기화 및 API 키 설정"""
-        # API 키를 환경 변수에서 직접 가져옴 (settings 객체 대신)
         self.api_key = os.getenv("GOOGLE_API_KEY")
         
         if not self.api_key:
@@ -37,20 +36,22 @@ class StorytellingGenerator:
     def create_storytelling_prompt(self, questions: List[Dict[str, Any]], 
                                    answers: List[Dict[str, Any]], 
                                    options: Optional[Dict[str, Any]] = None) -> str:
-        """프롬프트 생성 메서드"""
-        
-        # 옵션 처리
-        style = options.get("style", "emotional") if options else "emotional"
+        """프롬프트 생성 메서드 """
+
+        style = options.get("style", "warmly reflective") if options else "warmly reflective"
         length = options.get("length", "medium") if options else "medium"
-        
-        # 카테고리별 질문 분류
+        length_desc = {
+            "short": "약 150-250자",
+            "medium": "약 300-500자",
+            "long": "약 500-700자"
+        }.get(length, "약 300-500자")
+
         categorized_qa = {}
         for q in questions:
             category = q.get("category", "general")
             if category not in categorized_qa:
                 categorized_qa[category] = []
             
-            # 해당 질문에 대한 답변 찾기
             q_id = q.get("id")
             answer_text = "답변 없음"
             for a in answers:
@@ -65,44 +66,55 @@ class StorytellingGenerator:
                 "theme": q.get("theme", "general")
             })
         
-        # 프롬프트 구성
-        prompt = f"""# 스토리텔링 생성 요청
+        prompt = f"""# 스토리텔링 생성 요청: 사진 속 기억에 생명 불어넣기
 
-## 배경 정보
-사진에 담긴 추억과 관련된 질문-답변을 기반으로 감성적인 스토리텔링을 생성해주세요.
-이미지와 텍스트를 함께 분석하여 사용자의 기억을 생생하고 의미있게 재구성해 주세요.
+## **Core Task:**
+주어진 사진 이미지와 사용자의 질문-답변 내용을 깊이 분석하여, 단순한 정보 나열이 아닌 **사용자의 소중한 추억을 따뜻하고 의미 있게 재구성하는 감성 스토리텔링**을 생성합니다. 목표는 사용자가 그 순간의 감정과 의미를 다시 느낄 수 있도록 돕는 것입니다.
 
-## 질문과 답변 정보
-다음은 사진과 관련된 질문과 답변입니다:
+## **Input Analysis Guidance:**
+
+1.  **Image First Analysis:**
+    *   사진의 전체적인 분위기(예: 행복, 평온, 활기참, 그리움)를 파악하세요.
+    *   주요 인물의 표정, 시선, 자세를 관찰하고 감정을 추론하세요.
+    *   배경(장소, 시간대, 계절)과 주요 사물(특별한 의미가 있을 수 있는 것)을 주의 깊게 보세요.
+    *   이 시각적 정보들을 스토리의 뼈대로 활용하세요.
+
+2.  **Q&A Deep Dive:**
+    *   각 답변에서 사용자가 강조하는 **핵심 감정, 인물, 장소, 사건**을 파악하세요.
+    *   답변들 사이의 연관성을 찾아 **숨겨진 이야기나 주제**(예: 가족애, 우정, 성장의 순간, 소소한 행복)를 발견하세요.
+    *   질문의 'theme'이나 'category'를 참고하여 답변의 맥락을 더 깊이 이해하세요.
+    *   답변이 짧거나 추상적이더라도, 이미지 정보와 결합하여 구체적인 장면이나 감정으로 확장해 보세요.
+
+## **Narrative Crafting Instructions:**
+
+1.  **Find the Emotional Core:** 스토리의 중심이 될 **가장 중요한 감정이나 의미**를 결정하세요. (예: '그날의 햇살만큼 따스했던 할머니의 미소', '서툴지만 함께여서 즐거웠던 첫 캠핑의 설렘')
+2.  **Weave Image and Text Seamlessly:** 사진 속 시각적 요소(색감, 빛, 사물, 인물의 모습 등)를 묘사하며, 이를 사용자의 답변 내용과 자연스럽게 연결하세요. 단순히 '사진에는 A가 있다'가 아니라, '사진 속 당신의 미소는 [답변 내용]을 떠올리게 합니다' 와 같이 통합적으로 서술하세요.
+3.  **Show, Don't Just Tell:** '행복했다'고 말하기보다, 웃음소리, 따뜻한 눈빛, 편안한 분위기 등을 묘사하여 행복을 **보여주세요.**
+4.  **Sensory Richness:** 시각 정보 외에도, 그 순간에 있었을 법한 소리, 냄새, 촉감, 분위기 등을 상상하여 생생함을 더하세요. (예: '왁자지껄한 웃음소리가 들리는 듯하다', '짭짤한 바다 내음이 느껴지는 것 같다')
+5.  **Meaningful Reflection:** 스토리 끝에는 그 기억이 사용자에게 어떤 의미를 지니는지, 혹은 그날의 감정이 현재까지 어떻게 이어지는지에 대한 짧고 따뜻한 성찰이나 여운을 남겨주세요.
+6.  **Perspective & Tone:**
+    *   **스타일:** `{style}` (예: 따뜻하고 회상적인, 공감적이고 다정한, 약간은 아련한). 사용자의 감정을 존중하며 긍정적이고 부드러운 어조를 유지하세요.
+    *   **시점:** 1인칭('나' 또는 '우리') 또는 사용자에게 말을 거는 듯한 2인칭('당신은', '기억하나요?')이나 따뜻한 3인칭 서술자 시점을 유연하게 사용하되, **일관성**을 유지하세요. 사용자의 답변 뉘앙스에 가장 잘 어울리는 시점을 선택하세요.
+
+## **Output Specifications:**
+
+*   **길이:** `{length_desc}` 로 작성해주세요.
+*   **형식:** 제목 없이, 마크다운 서식(예: `#`, `*`)을 사용하지 않은 **일반 텍스트**로만 작성해주세요.
+*   **가독성:** 자연스러운 단락 구분을 사용하여 읽기 편하게 구성해주세요.
+*   **내용:** 긍정적이고 감동을 줄 수 있는 내용에 초점을 맞추세요.
+
+## **질문과 답변 정보:**
+다음은 분석에 사용할 질문과 답변입니다:
 
 """
         
-        # 카테고리별 질문-답변 추가
         for category, qa_list in categorized_qa.items():
             prompt += f"\n### {category.upper()} 카테고리\n"
             for qa in qa_list:
-                prompt += f"- 질문: {qa['question']}\n"
+                prompt += f"- 질문 ({qa['theme'] if qa.get('theme') else 'general'} / Level {qa['level']}): {qa['question']}\n"
                 prompt += f"  답변: {qa['answer']}\n"
         
-        # 스타일 지침 추가
-        prompt += f"\n## 스타일 가이드라인\n"
-        prompt += f"- 스타일: {style} (감정적이고 개인적인 어조로 작성)\n"
-        prompt += f"- 길이: {length} (중간 길이의 이야기로, 약 300-500자)\n"
-        
-        # 추가 지침
-        prompt += """
-## 작성 지침
-1. 답변에서 언급된 시간, 장소, 감정, 인물을 중심으로 스토리를 구성하세요.
-2. 사진에 보이는 요소들을 스토리에 자연스럽게 통합하세요.
-3. 사용자의 감정과 기억을 존중하고 긍정적인 메시지를 담아주세요.
-4. 1인칭 또는 3인칭 시점을 자유롭게 선택하여 몰입감 있는 스토리를 만들어주세요.
-5. 문학적 표현과 생생한 묘사를 통해 감성을 자극하는 스토리를 작성하세요.
-
-## 출력 형식
-- 제목은 필요하지 않습니다.
-- 마크다운 서식을 사용하지 말고 일반 텍스트로 작성해주세요.
-- 단락 구분을 통해 읽기 쉽게 구성해주세요.
-"""
+        prompt += "\n---\n**이제 위의 가이드라인에 따라, 이미지와 Q&A를 종합하여 감동적인 스토리텔링을 작성해주세요.**"
         
         return prompt
     
