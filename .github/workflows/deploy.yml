@@ -41,7 +41,8 @@ jobs:
         port: 22
         script: |
           cd memory-AI
-          git pull origin main
+          git fetch origin
+          git reset --hard origin/main
           source venv/bin/activate
           pip install -r requirements.txt
           sudo systemctl restart start-fastapi
