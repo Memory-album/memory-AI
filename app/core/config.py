@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # 백엔드 서버 설정
-    BACKEND_SERVER_HOST: str = "http://localhost:8080"
+    BACKEND_SERVER_HOST: str = "http://3.34.51.218/"
     
     # CORS 설정
     BACKEND_CORS_ORIGINS: List[str] = [
